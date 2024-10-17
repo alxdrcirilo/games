@@ -12,4 +12,8 @@ export default defineNuxtConfig({
   app: {
     baseURL: '/games/'
   },
+  colorMode: {
+    preference: 'light',
+    fallback: 'light',
+  },
 })

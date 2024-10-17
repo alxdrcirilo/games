@@ -1,10 +1,8 @@
 <template>
-  <Table />
+  <NuxtPage />
 </template>
 
 <script setup>
-import Table from "~/components/Table.vue"
-
 useHead({
   title: "Alexandre Cirilo - Game Reviews",
   meta: [
@@ -23,9 +21,13 @@ useHead({
 <style>
 * {
   font-size: 0.9rem;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  font-family: "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", "Courier", "monospace";
+@media (max-width: 480px) {
+  * {
+    font-size: 0.85rem;
+  }
 }
 </style>

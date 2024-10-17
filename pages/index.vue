@@ -127,7 +127,7 @@ import getStoreColor from "~/utils/getStoreColor";
 
 // Theme
 const colorMode = useColorMode();
-colorMode.value = "dark"; // Default to dark theme
+colorMode.value = "light"; // Default to light theme
 const isDarkTheme = ref(colorMode.value === "dark" ? true : false);
 watch(isDarkTheme, (newVal) => {
   colorMode.value = isDarkTheme.value ? "dark" : "light";
@@ -1150,3 +1150,20 @@ const rows = computed(() => {
   return filteredRows.value.slice((page.value - 1) * pageCount.value, (page.value) * pageCount.value)
 })
 </script>
+
+<style>
+body {
+  font-family: "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", "Courier", "monospace";
+  background-color: #fcf2ec;
+  transition: color 0.5s, background-color 0.5s;
+}
+
+.dark body {
+  background-color: #222222;
+  color: #ebf4f1;
+}
+
+.dark td {
+  border-bottom: 1px solid rgba(252, 242, 236, 0.1);
+}
+</style>

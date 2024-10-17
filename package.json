@@ -1,0 +1,22 @@
+{
+  "name": "game-reviews",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "clean": "rm -rf .nuxt .output dist node_modules",
+    "deploy": "push-dir --dir=dist --branch=gh-pages --cleanup",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate && touch dist/.nojekyll",
+    "preview": "nuxt preview"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^2.18.7",
+    "@nuxtjs/color-mode": "^3.5.1",
+    "heroicons": "^2.1.5",
+    "nuxt": "^3.13.0"
+  },
+  "devDependencies": {
+    "push-dir": "^0.4.1"
+  }
+}

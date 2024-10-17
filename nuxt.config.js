@@ -13,7 +13,7 @@ export default defineNuxtConfig({
     baseURL: '/games/'
   },
   colorMode: {
-    preference: 'light',
-    fallback: 'light',
+    preference: 'dark',
+    fallback: 'dark',
   },
 })

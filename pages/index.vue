@@ -127,9 +127,9 @@ import getStoreColor from "~/utils/getStoreColor";
 
 // Theme
 const colorMode = useColorMode();
-colorMode.value = "light"; // Default to light theme
+colorMode.value = "dark"; // Default to light theme
 const isDarkTheme = ref(colorMode.value === "dark" ? true : false);
-watch(isDarkTheme, (newVal) => {
+watch(isDarkTheme, () => {
   colorMode.value = isDarkTheme.value ? "dark" : "light";
 });
 

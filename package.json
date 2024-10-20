@@ -8,9 +8,12 @@
     "deploy": "push-dir --dir=dist --branch=gh-pages --cleanup",
     "dev": "nuxt dev",
     "generate": "nuxt generate && touch dist/.nojekyll",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
     "preview": "nuxt preview"
   },
   "dependencies": {
+    "@nuxt/eslint": "^0.6.0",
     "@nuxt/ui": "^2.18.7",
     "@nuxtjs/color-mode": "^3.5.1",
     "heroicons": "^2.1.5",

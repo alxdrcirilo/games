@@ -2,10 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-10-15',
   devtools: { enabled: false },
-  modules: [
-    '@nuxt/ui',
-    '@nuxtjs/color-mode',
-  ],
+  modules: ['@nuxt/ui', '@nuxtjs/color-mode', '@nuxt/eslint'],
   routeRules: {
     '/': { prerender: true }
   },

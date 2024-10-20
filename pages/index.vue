@@ -16,11 +16,11 @@
               Columns
             </UButton>
           </USelectMenu>
-          <UButton icon="i-heroicons-funnel" color="gray" size="xs" :disabled="q === ''" @click="resetFilters">
+          <UButton icon="i-heroicons-arrow-path" color="gray" size="xs" :disabled="q === ''" @click="resetFilters">
             Reset
           </UButton>
           <!-- Light/dark theme -->
-          <UToggle class="ml-4" v-model="isDarkTheme" on-icon="i-heroicons-moon-20-solid"
+          <UToggle v-model="isDarkTheme" class="ml-4" on-icon="i-heroicons-moon-20-solid"
             off-icon="i-heroicons-sun-20-solid" />
         </div>
       </div>
@@ -40,7 +40,7 @@
         <!-- Genre -->
         <template #Genres-data="{ row }">
           <div v-if="row.Genres">
-            <span class="pr-1" v-for="genre in row.Genres.split(',')" :key="genre">
+            <span v-for="genre in row.Genres.split(',')" :key="genre" class="pr-1">
               <UBadge size="xs" :label="genre" :color="getGenreColor(genre)" variant="soft" />
             </span>
           </div>
@@ -78,7 +78,7 @@
         <!-- Store -->
         <template #Store-data="{ row }">
           <div v-if="row.Store">
-            <span class="pr-1" v-for="store in row.Store.split(',')" :key="store">
+            <span v-for="store in row.Store.split(',')" :key="store" class="pr-1">
               <UBadge size="xs" :label="store" :color="getStoreColor(store)" variant="soft" />
             </span>
           </div>
@@ -87,7 +87,7 @@
         <!-- Platforms -->
         <template #Platforms-data="{ row }">
           <div v-if="row.Platforms">
-            <span class="pr-1" v-for="platform in row.Platforms.split(',')" :key="platform">
+            <span v-for="platform in row.Platforms.split(',')" :key="platform" class="pr-1">
               <UBadge size="xs" :label="platform" :color="getPlatformColor(platform)" variant="soft" />
             </span>
           </div>
@@ -96,38 +96,35 @@
     </div>
 
     <div class="h-1/8">
-      <!-- Page count -->
+      <!-- Made with ❤️ -->
       <div class="flex justify-between items-center px-3 py-3.5 border-t border-gray-500">
         <p class="text-xs">
           Made with ❤️ by
           <a class="text-xs text-amber-400 hover:underline" href="https://github.com/alxdrcirilo"
             target="_blank">alxdrcirilo</a>
         </p>
-        <div class="hidden sm:block">
+        <!-- Game count -->
+        <div>
           <span class="text-xs leading-5">
             Showing
-            <span class="text-xs">{{ pageFrom }}</span>
-            to
-            <span class="text-xs">{{ pageTo }}</span>
-            of
-            <span class="text-xs">{{ pageTotal }}</span>
-            results
+            <span class="text-xs">{{ rows.length }}</span>
+            games
           </span>
         </div>
-        <UPagination v-model="page" :page-count="pageCount" :total="games.length" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { computed } from "vue";
 import getGenreColor from "~/utils/getGenreColor";
 import getPlatformColor from "~/utils/getPlatformColor";
 import getStoreColor from "~/utils/getStoreColor";
 
 // Theme
 const colorMode = useColorMode();
-colorMode.value = "dark"; // Default to light theme
+colorMode.value = "dark"; // Default to dark theme
 const isDarkTheme = ref(colorMode.value === "dark" ? true : false);
 watch(isDarkTheme, () => {
   colorMode.value = isDarkTheme.value ? "dark" : "light";
@@ -1129,26 +1126,17 @@ const filteredRows = computed(() => {
     return games
   }
 
-  return games.filter((game) => {
-    return game.Name.toLowerCase().includes(q.value.toLowerCase());
-  });
+  const query = q.value.toLowerCase()
+  return games.filter((game) => game.Name.toLowerCase().includes(query))
 })
+
+const rows = computed(() => filteredRows.value.slice(0, games.length))
 
 // Reset filters
 const resetFilters = () => {
   q.value = ""
   selectedStatus.value = []
 }
-
-// Pagination
-const page = ref(1)
-const pageCount = ref(15)
-const pageTotal = ref(games.length)
-const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1)
-const pageTo = computed(() => Math.min(page.value * pageCount.value, pageTotal.value))
-const rows = computed(() => {
-  return filteredRows.value.slice((page.value - 1) * pageCount.value, (page.value) * pageCount.value)
-})
 </script>
 
 <style>

@@ -1,6 +1,6 @@
 const storeColors = {
   GOG: "purple",
-  Steam: "gray",
+  Steam: "sky",
   Ubisoft: "blue",
   EA: "orange"
 };

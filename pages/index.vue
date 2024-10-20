@@ -1115,6 +1115,9 @@ const games = [
   }
 ]
 
+// Sort games by "Name"
+games.sort((a, b) => a.Name.localeCompare(b.Name))
+
 // Filtered columns
 const selectedColumns = ref(columns)
 const columnsTable = computed(() => columns.filter((column) => selectedColumns.value.includes(column)))
@@ -1130,6 +1133,7 @@ const filteredRows = computed(() => {
   return games.filter((game) => game.Name.toLowerCase().includes(query))
 })
 
+// TODO: Probably not needed and could just pass filteredRows
 const rows = computed(() => filteredRows.value.slice(0, games.length))
 
 // Reset filters

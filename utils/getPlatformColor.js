@@ -5,7 +5,7 @@ const platformColors = {
     "Mac": "amber",
     "Nintendo DS": "yellow",
     "Nintendo Switch": "orange",
-    "PC": "gray",
+    "PC": "pink",
     "PlayStation": "blue",
     "Wii U": "pink",
     "Xbox": "green",

@@ -5,7 +5,7 @@ const genreColors = {
   "Platform": "yellow",
   "Point-and-click": "lime",
   "Puzzle": "indigo",
-  "Racing": "emeral",
+  "Racing": "emerald",
   "Real Time Strategy (RTS)": "orange",
   "Role-playing (RPG)": "sky",
   "Shooter": "cyan",
@@ -13,7 +13,7 @@ const genreColors = {
   "Strategy": "green",
   "Tactical": "violet",
   "Turn-based strategy (TBS)": "purple",
-  "Visual Novel": "fuchsia",
+  "Visual Novel": "pink",
 };
 
 export default function getGenreColor(genre) {

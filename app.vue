@@ -20,14 +20,9 @@ useHead({
 
 <style>
 * {
-  font-size: 0.9rem;
+  font-family: "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", "Courier", "monospace";
+  font-size: 0.85rem;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-@media (max-width: 480px) {
-  * {
-    font-size: 0.85rem;
-  }
 }
 </style>

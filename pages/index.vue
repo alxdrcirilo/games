@@ -55,8 +55,8 @@
 
         <!-- Name -->
         <template #Name-data="{ row }">
-          <a :href="row.URL" target="_blank" class="underline">
-            {{ row.Name }}
+          <a :href="row.URL" target="_blank" class="hover:underline">
+            <strong>{{ row.Name }}</strong>
           </a>
         </template>
 

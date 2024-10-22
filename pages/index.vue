@@ -89,13 +89,13 @@
         <!-- Bought -->
         <template #Bought-data="{ row }">
           <UBadge size="xs" :label="row.Bought ? 'Yes' : 'No'" :color="row.Bought ? 'emerald' : 'orange'"
-            variant="outline" />
+            variant="outline" :ui="uiVariant" />
         </template>
 
         <!-- Played -->
         <template #Played-data="{ row }">
           <UBadge size="xs" :label="row.Played ? 'Yes' : 'No'" :color="row.Played ? 'emerald' : 'orange'"
-            variant="outline" />
+            variant="outline" :ui="uiVariant" />
         </template>
 
         <!-- Store -->
@@ -224,6 +224,9 @@ const resetFilters = () => {
   q.value = ""
   selectedStatus.value = []
 }
+
+// Custom outline
+const uiVariant = { variant: { color: { emerald: { outline: 'ring-emerald-500' } }, orange: { outline: 'ring-orange-500' } } }
 </script>
 
 <style>

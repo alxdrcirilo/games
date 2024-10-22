@@ -4,8 +4,8 @@
       <!-- Title -->
       <div class="flex justify-between items-center gap-3 p-6 mb-6 border-b border-gray-400 border-dashed">
         <div class="flex justify-start items-center">
-            <UAvatar class="mr-3" src="https://avatars.githubusercontent.com/u/38657258?v=4" />
-            <h1 class="text-xl font-semibold">Game Reviews 🕹️</h1>
+          <UAvatar class="mr-3" src="https://avatars.githubusercontent.com/u/38657258?v=4" />
+          <h1 class="text-xl font-semibold">Game Reviews 🕹️</h1>
         </div>
         <div class="flex justify-end hover:opacity-50 transition-opacity duration-700">
           <!-- Light/dark theme -->
@@ -89,13 +89,13 @@
         <!-- Bought -->
         <template #Bought-data="{ row }">
           <UBadge size="xs" :label="row.Bought ? 'Yes' : 'No'" :color="row.Bought ? 'emerald' : 'orange'"
-            variant="soft" />
+            variant="outline" />
         </template>
 
         <!-- Played -->
         <template #Played-data="{ row }">
           <UBadge size="xs" :label="row.Played ? 'Yes' : 'No'" :color="row.Played ? 'emerald' : 'orange'"
-            variant="soft" />
+            variant="outline" />
         </template>
 
         <!-- Store -->

@@ -71,19 +71,23 @@
 
         <!-- Stars -->
         <template #Stars-data="{ row }">
-          <UPopover v-if="row.Review" mode="hover">
-            <UButton size="xs" icon="i-heroicons-information-circle-20-solid" color="gray" trailing variant="ghost">
+          <UPopover mode="hover">
+            <UButton v-if="row.Stars && row.Review" size="xs" icon="i-heroicons-information-circle-20-solid" color="gray" trailing variant="ghost">
               {{ row.Stars }}
             </UButton>
+            <UButton v-if="row.Stars && !row.Review" size="xs"color="gray" variant="ghost">
+              {{ row.Stars }}
+            </UButton>
+            <div v-if="!row.Stars">Not rated</div>
             <template #panel>
-              <div class="p-4 w-80 whitespace-pre-wrap text-sm">
+              <div v-if="row.Review" class="p-4 w-80 whitespace-pre-wrap text-sm">
                 {{ row.Review }}
               </div>
             </template>
           </UPopover>
-          <UButton v-else size="xs" color="gray" trailing variant="ghost">
+          <!-- <UButton v-else size="xs" color="gray" trailing variant="ghost">
             {{ row.Stars }}
-          </UButton>
+          </UButton> -->
         </template>
 
         <!-- Bought -->

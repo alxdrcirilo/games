@@ -88,13 +88,13 @@
 
         <!-- Bought -->
         <template #Bought-data="{ row }">
-          <UBadge size="xs" :label="row.Bought == 'Yes' ? 'Yes' : 'No'" :color="row.Bought ? 'emerald' : 'orange'"
+          <UBadge size="xs" :label="row.Bought ? 'Yes' : 'No'" :color="row.Bought ? 'emerald' : 'orange'"
             variant="soft" />
         </template>
 
         <!-- Played -->
         <template #Played-data="{ row }">
-          <UBadge size="xs" :label="row.Bought == 'Yes' ? 'Yes' : 'No'" :color="row.Bought ? 'emerald' : 'orange'"
+          <UBadge size="xs" :label="row.Played ? 'Yes' : 'No'" :color="row.Played ? 'emerald' : 'orange'"
             variant="soft" />
         </template>
 

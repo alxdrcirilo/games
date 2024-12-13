@@ -42,6 +42,9 @@
               Columns
             </UButton>
           </USelectMenu>
+          <UButton icon="i-heroicons-star" color="gray" size="xs" @click="showReviewedOnly">
+            Reviewed
+          </UButton>
           <UButton icon="i-heroicons-arrow-path" color="gray" size="xs" :disabled="q === ''" @click="resetFilters">
             Reset
           </UButton>
@@ -63,7 +66,7 @@
         <!-- Genre -->
         <template #Genres-data="{ row }">
           <div v-if="row.Genres">
-            <span v-for="genre in row.Genres.split(',')" :key="genre" class="pr-2 mb-1 block">
+            <span v-for="genre in row.Genres.split(',')" :key="genre" class="pr-2">
               <UBadge size="xs" :label="genre" :color="getGenreColor(genre)" variant="soft" />
             </span>
           </div>
@@ -72,41 +75,43 @@
         <!-- Stars -->
         <template #Stars-data="{ row }">
           <UPopover mode="hover">
-            <UButton v-if="row.Stars && row.Review" size="xs" icon="i-heroicons-information-circle-20-solid" color="gray" trailing variant="ghost">
+            <UButton v-if="row.Stars && row.Review" size="xs" icon="i-heroicons-chat-bubble-bottom-center-text-20-solid"
+              color="gray" trailing variant="ghost">
               {{ row.Stars }}
             </UButton>
-            <UButton v-if="row.Stars && !row.Review" size="xs"color="gray" variant="ghost">
+            <UButton v-if="row.Stars && !row.Review" size="xs" color="gray" variant="ghost">
               {{ row.Stars }}
             </UButton>
-            <div v-if="!row.Stars">Not rated</div>
+            <div v-if="!row.Stars">
+              <UButton size="xs" color="gray" variant="ghost">
+                Not rated
+              </UButton>
+            </div>
             <template #panel>
               <div v-if="row.Review" class="p-4 w-80 whitespace-pre-wrap text-sm">
                 {{ row.Review }}
               </div>
             </template>
           </UPopover>
-          <!-- <UButton v-else size="xs" color="gray" trailing variant="ghost">
-            {{ row.Stars }}
-          </UButton> -->
         </template>
 
         <!-- Bought -->
         <template #Bought-data="{ row }">
-          <UBadge size="xs" :label="row.Bought ? 'Yes' : 'No'" :color="row.Bought ? 'emerald' : 'orange'"
-            variant="outline" :ui="uiVariant" />
+            <div class="text-xl text-center text-emerald-500" v-if="row.Bought">✓</div>
+          <div class="text-xl text-center text-red-500" v-else>✕</div>
         </template>
 
         <!-- Played -->
         <template #Played-data="{ row }">
-          <UBadge size="xs" :label="row.Played ? 'Yes' : 'No'" :color="row.Played ? 'emerald' : 'orange'"
-            variant="outline" :ui="uiVariant" />
+          <div class="text-xl text-center text-emerald-500" v-if="row.Bought">✓</div>
+          <div class="text-xl text-center text-red-500" v-else>✕</div>
         </template>
 
         <!-- Store -->
         <template #Store-data="{ row }">
           <div v-if="row.Store">
             <span v-for="store in row.Store.split(',')" :key="store" class="pr-2">
-              <UBadge size="xs" :label="store" :color="getStoreColor(store)" variant="solid" />
+              <UBadge size="xs" :label="store" :color="getStoreColor(store)" variant="soft" />
             </span>
           </div>
         </template>
@@ -115,7 +120,7 @@
         <template #Platforms-data="{ row }">
           <div v-if="row.Platforms">
             <span v-for="platform in row.Platforms.split(',')" :key="platform" class="pr-2">
-              <UBadge size="xs" :label="platform" color="gray" variant="soft" />
+              <UBadge size="xs" :label="platform" color="gray" variant="solid" />
             </span>
           </div>
         </template>
@@ -166,10 +171,6 @@ const columns = [{
   label: "Year",
   sortable: true,
 }, {
-  key: "Genres",
-  label: "Genres",
-  sortable: false,
-}, {
   key: "Rating",
   label: "Rating",
   sortable: true,
@@ -182,6 +183,14 @@ const columns = [{
   label: "Stars",
   sortable: true,
 }, {
+  key: "Genres",
+  label: "Genres",
+  sortable: false,
+}, {
+  key: "Store",
+  label: "Store",
+  sortable: false,
+}, {
   key: "Bought",
   label: "Bought",
   sortable: true,
@@ -189,10 +198,6 @@ const columns = [{
   key: "Played",
   label: "Played",
   sortable: true,
-}, {
-  key: "Store",
-  label: "Store",
-  sortable: false,
 }, {
   key: "Platforms",
   label: "Platforms",
@@ -229,12 +234,30 @@ const resetFilters = () => {
   selectedStatus.value = []
 }
 
-// Custom outline
-const uiVariant = { variant: { color: { emerald: { outline: 'ring-emerald-500' } }, orange: { outline: 'ring-orange-500' } } }
+// Show reviewed games only
+const reviewedGames = games.filter((game) => game.Review)
+const showReviewedOnly = () => {
+  console.log("Hey!")
+  console.log(reviewedGames.length)
+  return reviewedGames
+}
+
+// Custom outline (previously used in "Bought" and "Played" columns)
+// const uiVariant = { variant: { color: { emerald: { outline: 'ring-emerald-500' } }, orange: { outline: 'ring-orange-500' } } }
 </script>
 
 <style>
 @import url('~/assets/lightbulb.min.css');
+
+@font-face {
+  font-family: 'Pixeloid';
+  src: url('~/assets/fonts/PixeloidSans.ttf') format('truetype');
+}
+
+* {
+  font-family: 'Pixeloid';
+  font-size: 0.85rem;
+}
 
 body {
   background-color: #fcf2ec;

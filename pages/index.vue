@@ -42,9 +42,9 @@
               Columns
             </UButton>
           </USelectMenu>
-          <UButton icon="i-heroicons-star" color="gray" size="xs" @click="showReviewedOnly">
+            <UButton :icon="r ? 'i-heroicons-star-solid' : 'i-heroicons-star'" color="gray" size="xs" @click="r = !r">
             Reviewed
-          </UButton>
+            </UButton>
           <UButton icon="i-heroicons-arrow-path" color="gray" size="xs" :disabled="q === ''" @click="resetFilters">
             Reset
           </UButton>
@@ -97,7 +97,7 @@
 
         <!-- Bought -->
         <template #Bought-data="{ row }">
-            <div class="text-xl text-center text-emerald-500" v-if="row.Bought">✓</div>
+          <div class="text-xl text-center text-emerald-500" v-if="row.Bought">✓</div>
           <div class="text-xl text-center text-red-500" v-else>✕</div>
         </template>
 
@@ -149,7 +149,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import getGenreColor from "~/utils/getGenreColor";
 import getPlatformColor from "~/utils/getPlatformColor";
 import getStoreColor from "~/utils/getStoreColor";
@@ -214,15 +214,21 @@ games.sort((a, b) => a.Name.localeCompare(b.Name))
 const selectedColumns = ref(columns)
 const columnsTable = computed(() => columns.filter((column) => selectedColumns.value.includes(column)))
 
-// Filtered rows
+// Filter rows based on query and reviewed games
 const q = ref("")
+const r = ref(false)
+const reviewedGames = games.filter((game) => game.Review)
 const filteredRows = computed(() => {
+  // Filter games based on reviewed or not
+  let _games = r.value ? reviewedGames : games
+
+  // Filter games based on query
   if (!q.value) {
-    return games
+    return _games
   }
 
   const query = q.value.toLowerCase()
-  return games.filter((game) => game.Name.toLowerCase().includes(query))
+  return _games.filter((game) => game.Name.toLowerCase().includes(query))
 })
 
 // TODO: Probably not needed and could just pass filteredRows
@@ -232,14 +238,6 @@ const rows = computed(() => filteredRows.value.slice(0, games.length))
 const resetFilters = () => {
   q.value = ""
   selectedStatus.value = []
-}
-
-// Show reviewed games only
-const reviewedGames = games.filter((game) => game.Review)
-const showReviewedOnly = () => {
-  console.log("Hey!")
-  console.log(reviewedGames.length)
-  return reviewedGames
 }
 
 // Custom outline (previously used in "Bought" and "Played" columns)
@@ -259,6 +257,10 @@ const showReviewedOnly = () => {
   font-size: 0.85rem;
 }
 
+.dark * {
+  color: #dbdbdb;
+}
+
 body {
   background-color: #fcf2ec;
   transition: color 0.5s, background-color 0.5s;
@@ -266,7 +268,6 @@ body {
 
 .dark body {
   background-color: #222222;
-  color: #ebf4f1;
 }
 
 .dark td {

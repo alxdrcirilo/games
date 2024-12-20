@@ -13,4 +13,5 @@ export default defineNuxtConfig({
     preference: 'dark',
     fallback: 'dark',
   },
+  css: ['~/assets/css/main.css'],
 })

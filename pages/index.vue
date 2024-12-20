@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col ml-8 mr-8 h-screen">
+  <div class="flex flex-col p-1 ml-8 mr-8 h-screen">
     <div class="h-1/8">
       <!-- Title -->
       <div class="flex justify-between items-center gap-3 p-6 mb-6 border-b border-gray-400 border-dashed">
@@ -42,9 +42,9 @@
               Columns
             </UButton>
           </USelectMenu>
-            <UButton :icon="r ? 'i-heroicons-star-solid' : 'i-heroicons-star'" color="gray" size="xs" @click="r = !r">
+          <UButton :icon="r ? 'i-heroicons-star-solid' : 'i-heroicons-star'" color="gray" size="xs" @click="r = !r">
             Reviewed
-            </UButton>
+          </UButton>
           <UButton icon="i-heroicons-arrow-path" color="gray" size="xs" :disabled="q === ''" @click="resetFilters">
             Reset
           </UButton>
@@ -58,7 +58,8 @@
 
         <!-- Name -->
         <template #Name-data="{ row }">
-          <a :href="row.URL" target="_blank" class="hover:underline">
+          <a :href="row.URL" target="_blank"
+            :class="isDarkTheme ? 'text-stone-300  hover:underline' : 'text-stone-600  hover:underline'">
             <strong>{{ row.Name }}</strong>
           </a>
         </template>
@@ -75,8 +76,8 @@
         <!-- Stars -->
         <template #Stars-data="{ row }">
           <UPopover mode="hover">
-            <UButton v-if="row.Stars && row.Review" size="xs" icon="i-heroicons-chat-bubble-bottom-center-text-20-solid"
-              color="gray" trailing variant="ghost">
+            <UButton v-if="row.Stars && row.Review" size="xs" icon="i-heroicons-information-circle" color="gray"
+              trailing variant="ghost">
               {{ row.Stars }}
             </UButton>
             <UButton v-if="row.Stars && !row.Review" size="xs" color="gray" variant="ghost">
@@ -183,10 +184,6 @@ const columns = [{
   label: "Stars",
   sortable: true,
 }, {
-  key: "Genres",
-  label: "Genres",
-  sortable: false,
-}, {
   key: "Store",
   label: "Store",
   sortable: false,
@@ -198,6 +195,10 @@ const columns = [{
   key: "Played",
   label: "Played",
   sortable: true,
+}, {
+  key: "Genres",
+  label: "Genres",
+  sortable: false,
 }, {
   key: "Platforms",
   label: "Platforms",
@@ -243,34 +244,3 @@ const resetFilters = () => {
 // Custom outline (previously used in "Bought" and "Played" columns)
 // const uiVariant = { variant: { color: { emerald: { outline: 'ring-emerald-500' } }, orange: { outline: 'ring-orange-500' } } }
 </script>
-
-<style>
-@import url('~/assets/lightbulb.min.css');
-
-@font-face {
-  font-family: 'Pixeloid';
-  src: url('~/assets/fonts/PixeloidSans.ttf') format('truetype');
-}
-
-* {
-  font-family: 'Pixeloid';
-  font-size: 0.85rem;
-}
-
-.dark * {
-  color: #dbdbdb;
-}
-
-body {
-  background-color: #fcf2ec;
-  transition: color 0.5s, background-color 0.5s;
-}
-
-.dark body {
-  background-color: #222222;
-}
-
-.dark td {
-  border-bottom: 1px solid rgba(252, 242, 236, 0.1);
-}
-</style>

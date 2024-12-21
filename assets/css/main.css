@@ -1,23 +1,20 @@
-@import url('~/assets/css/lightbulb.min.css');
-
 @font-face {
     font-family: 'Pixeloid';
     src: url('~/assets/fonts/PixeloidSans.ttf') format('truetype');
 }
 
-*, .dark * {
+.dark * {
     font-family: 'Pixeloid';
 }
 
-body {
-    background-color: #fcf2ec;
-    transition: color 0.5s, background-color 0.5s;
+.dark table * {
+    font-size: 0.85rem;
 }
 
-.dark body {
+body {
     background-color: #222222;
 }
 
-.dark td {
+td {
     border-bottom: 1px solid rgba(252, 242, 236, 0.1);
 }

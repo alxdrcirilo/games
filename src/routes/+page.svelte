@@ -109,7 +109,12 @@
 						>
 					</th>
 					<th class="genres">Genres</th>
-					<th class="centered" style="cursor:pointer" title="Sort by Rating" on:click={() => sortGames('Rating')}>
+					<th
+						class="centered"
+						style="cursor:pointer"
+						title="Sort by Rating"
+						on:click={() => sortGames('Rating')}
+					>
 						Rating
 						<span style="font-size:0.8em;"
 							>{sortColumn === 'Rating' ? (sortAsc ? '↑' : '↓') : '↕'}</span
@@ -185,6 +190,11 @@
 			>
 		</p>
 		<p>Showing {games.length} games</p>
+		<p>
+			Last updated: {new Date(
+				import.meta.env.VITE_LAST_COMMIT_DATE || Date.now()
+			).toLocaleDateString()}
+		</p>
 	</footer>
 </div>
 
@@ -285,7 +295,7 @@
 		th:nth-child(4),
 		td:nth-child(4),
 		th:nth-child(3),
-		td:nth-child(3){
+		td:nth-child(3) {
 			display: none;
 		}
 	}

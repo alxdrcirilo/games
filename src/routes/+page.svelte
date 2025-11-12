@@ -1,6 +1,12 @@
 <script lang="ts">
 	import Tooltip from '$lib/Tooltip.svelte';
 	import gamesData from './games.json' assert { type: 'json' };
+	import { HugeiconsIcon } from '@hugeicons/svelte';
+	import {
+		ComputerIcon,
+		GameController01Icon,
+		NintendoSwitchIcon
+	} from '@hugeicons/core-free-icons';
 
 	type Game = {
 		Name: string;
@@ -96,13 +102,23 @@
 		<table>
 			<thead>
 				<tr>
-					<th style="cursor:pointer" title="Sort by Name" on:click={() => sortGames('Name')}>
+					<th
+						class="names"
+						style="cursor:pointer"
+						title="Sort by Name"
+						on:click={() => sortGames('Name')}
+					>
 						Name
 						<span style="font-size:0.8em;"
 							>{sortColumn === 'Name' ? (sortAsc ? '↑' : '↓') : '↕'}</span
 						>
 					</th>
-					<th style="cursor:pointer" title="Sort by Year" on:click={() => sortGames('Year')}>
+					<th
+						class="year"
+						style="cursor:pointer"
+						title="Sort by Year"
+						on:click={() => sortGames('Year')}
+					>
 						Year
 						<span style="font-size:0.8em;"
 							>{sortColumn === 'Year' ? (sortAsc ? '↑' : '↓') : '↕'}</span
@@ -139,16 +155,29 @@
 			<tbody>
 				{#each games as game}
 					<tr>
-						<td>
-							{#if game.URL}
-								<a class="game-link" href={game.URL} target="_blank" rel="noopener noreferrer"
-									>{game.Name}</a
-								>
-							{:else}
-								{game.Name}
-							{/if}
+						<td class="names">
+							<div style="display: flex; justify-content: space-between; align-items: center;">
+								{#if game.URL}
+									<a class="game-link" href={game.URL} target="_blank" rel="noopener noreferrer"
+										>{game.Name}</a
+									>
+								{:else}
+									{game.Name}
+								{/if}
+								{#if game.Platform}
+									<span class="platform-icon">
+										{#if game.Platform.toLowerCase() === 'pc'}
+											<HugeiconsIcon icon={ComputerIcon} size="16" />
+										{:else if game.Platform.toLowerCase().includes('playstation')}
+											<HugeiconsIcon icon={GameController01Icon} size="16" color="#003791" />
+										{:else if game.Platform.toLowerCase().includes('nintendo switch')}
+											<HugeiconsIcon icon={NintendoSwitchIcon} size="16" color="#B71C1C" />
+										{/if}
+									</span>
+								{/if}
+							</div>
 						</td>
-						<td>{game.Year}</td>
+						<td class="year">{game.Year}</td>
 						<td class="genres">
 							{#if game.Genres}
 								{#each game.Genres.split(',').map((g) => g.trim()) as genre}
@@ -162,7 +191,9 @@
 						<td class="centered">{game.Playtime}</td>
 						<td class="centered review">
 							<Tooltip title={game.Review ? game.Review : 'No review available'}>
-								<span class={game.Review ? 'has-review' : ''}>{game.Stars}</span>
+								<span class={game.Review ? 'has-review' : ''}
+									>{'★'.repeat((game.Stars || '').split('⭐️').length - 1)}</span
+								>
 							</Tooltip>
 						</td>
 						<td class="centered">
@@ -261,6 +292,7 @@
 	.content {
 		overflow: auto;
 		padding: 0 20px;
+		margin-bottom: 36px; /* Account for footer (avoid cropping last row) */
 	}
 
 	th,
@@ -275,6 +307,29 @@
 		top: 0;
 		z-index: 2;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+	}
+
+	th.names,
+	td.names {
+		width: 20%;
+		max-width: 30%;
+		white-space: nowrap;
+	}
+
+	/* Don't apply white-space: nowrap on mobile */
+	@media (max-width: 600px) {
+		th.names,
+		td.names {
+			width: 50%;
+			white-space: wrap;
+		}
+	}
+
+	th.year,
+	td.year {
+		width: 5%;
+		max-width: 10%;
+		white-space: nowrap;
 	}
 
 	th.genres,
@@ -326,6 +381,13 @@
 		text-decoration: dashed underline;
 		text-underline-offset: 5px;
 		text-decoration-color: rgba(34, 34, 34, 0.5);
+	}
+
+	.platform-icon {
+		align-items: center;
+		display: flex;
+		margin-left: 16px;
+		opacity: 0.7;
 	}
 
 	footer {

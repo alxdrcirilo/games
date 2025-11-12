@@ -1,6 +1,12 @@
 <script lang="ts">
 	import Tooltip from '$lib/Tooltip.svelte';
 	import gamesData from './games.json' assert { type: 'json' };
+	import { HugeiconsIcon } from '@hugeicons/svelte';
+	import {
+		ComputerIcon,
+		GameController01Icon,
+		NintendoSwitchIcon
+	} from '@hugeicons/core-free-icons';
 
 	type Game = {
 		Name: string;
@@ -10,6 +16,7 @@
 		Playtime?: number;
 		Stars?: string;
 		Review?: string;
+		Platform?: string;
 		Bought?: string;
 		Played?: string;
 		Store?: string;
@@ -59,21 +66,21 @@
 
 	// Genre colors
 	const colors = [
-		'#EDACBF',
-		'#D7BFE1',
-		'#CCD1E3',
-		'#D5DBDF',
-		'#E2E2E2',
-		'#B9CC77',
-		'#E0C59F',
-		'#E2CCC8',
-		'#DFD8DB',
-		'#E2E2E2',
-		'#95C9EC',
-		'#9CD6D5',
-		'#C3D9C7',
-		'#DBDBD4',
-		'#E2E2E2'
+		'var(--pink)',
+		'var(--lavender)',
+		'var(--periwinkle)',
+		'var(--silver)',
+		'var(--light-gray)',
+		'var(--lime-green)',
+		'var(--peach)',
+		'var(--dusty-rose)',
+		'var(--mauve)',
+		'var(--light-gray-2)',
+		'var(--sky-blue)',
+		'var(--mint)',
+		'var(--sage)',
+		'var(--warm-gray)',
+		'var(--light-gray)'
 	];
 	const genreColors: Record<string, string> = {};
 	uniqueGenres.forEach((genre, i) => {
@@ -96,23 +103,33 @@
 		<table>
 			<thead>
 				<tr>
-					<th style="cursor:pointer" title="Sort by Name" on:click={() => sortGames('Name')}>
+					<th
+						class="names"
+						style="cursor:pointer"
+						title="Name of the game"
+						on:click={() => sortGames('Name')}
+					>
 						Name
 						<span style="font-size:0.8em;"
 							>{sortColumn === 'Name' ? (sortAsc ? '↑' : '↓') : '↕'}</span
 						>
 					</th>
-					<th style="cursor:pointer" title="Sort by Year" on:click={() => sortGames('Year')}>
+					<th
+						class="year"
+						style="cursor:pointer"
+						title="Release year"
+						on:click={() => sortGames('Year')}
+					>
 						Year
 						<span style="font-size:0.8em;"
 							>{sortColumn === 'Year' ? (sortAsc ? '↑' : '↓') : '↕'}</span
 						>
 					</th>
-					<th class="genres">Genres</th>
+					<th class="genres" style="cursor:default" title="Genres of the game">Genres</th>
 					<th
 						class="centered"
 						style="cursor:pointer"
-						title="Sort by Rating"
+						title="IGDB rating"
 						on:click={() => sortGames('Rating')}
 					>
 						Rating
@@ -123,7 +140,7 @@
 					<th
 						class="centered"
 						style="cursor:pointer"
-						title="Sort by Playtime"
+						title="Total playtime"
 						on:click={() => sortGames('Playtime')}
 					>
 						Playtime
@@ -131,24 +148,39 @@
 							>{sortColumn === 'Playtime' ? (sortAsc ? '↑' : '↓') : '↕'}</span
 						>
 					</th>
-					<th>Stars</th>
-					<th class="centered">Bought</th>
-					<th class="centered">Played</th>
+					<th style="cursor:default" title="Personal rating">Stars</th>
+					<th class="centered" style="cursor:default" title="Whether I own the game">Bought</th>
+					<th class="centered" style="cursor:default" title="Whether I have played the game"
+						>Played</th
+					>
 				</tr>
 			</thead>
 			<tbody>
 				{#each games as game}
 					<tr>
-						<td>
-							{#if game.URL}
-								<a class="game-link" href={game.URL} target="_blank" rel="noopener noreferrer"
-									>{game.Name}</a
-								>
-							{:else}
-								{game.Name}
-							{/if}
+						<td class="names">
+							<div style="display: flex; justify-content: space-between; align-items: center;">
+								{#if game.URL}
+									<a class="game-link" href={game.URL} target="_blank" rel="noopener noreferrer"
+										>{game.Name}</a
+									>
+								{:else}
+									{game.Name}
+								{/if}
+								{#if game.Platform}
+									<span class="platform-icon">
+										{#if game.Platform.toLowerCase() === 'pc'}
+											<HugeiconsIcon icon={ComputerIcon} size="16" />
+										{:else if game.Platform.toLowerCase().includes('playstation')}
+											<HugeiconsIcon icon={GameController01Icon} size="16" color="#003791" />
+										{:else if game.Platform.toLowerCase().includes('nintendo switch')}
+											<HugeiconsIcon icon={NintendoSwitchIcon} size="16" color="#B71C1C" />
+										{/if}
+									</span>
+								{/if}
+							</div>
 						</td>
-						<td>{game.Year}</td>
+						<td class="year">{game.Year}</td>
 						<td class="genres">
 							{#if game.Genres}
 								{#each game.Genres.split(',').map((g) => g.trim()) as genre}
@@ -162,7 +194,9 @@
 						<td class="centered">{game.Playtime}</td>
 						<td class="centered review">
 							<Tooltip title={game.Review ? game.Review : 'No review available'}>
-								<span class={game.Review ? 'has-review' : ''}>{game.Stars}</span>
+								<span class={game.Review ? 'has-review' : ''}
+									>{'★'.repeat((game.Stars || '').split('⭐️').length - 1)}</span
+								>
 							</Tooltip>
 						</td>
 						<td class="centered">
@@ -200,21 +234,21 @@
 
 <style>
 	:root {
-		--imperial-red: #f941424d;
-		--orange-crayola: #f3722c4d;
-		--carrot-orange: #f8961e4d;
-		--coral: #f9844a4d;
-		--saffron: #f9c74f4d;
-		--pistachio: #90be6d4d;
-		--zomp: #43aa8b4d;
-		--dark-cyan: #4d908e4d;
-		--paynes-gray: #5775904d;
-		--cerulean: #277da14d;
-		--amethyst: #9b5de54d;
-		--magenta: #f725854d;
-		--turquoise: #48cae44d;
-		--mint: #80ffdb4d;
-		--lemon: #ffd60a4d;
+		--pink: #edacbf;
+		--lavender: #d7bfe1;
+		--periwinkle: #ccd1e3;
+		--silver: #d5dbdf;
+		--light-gray: #e2e2e2;
+		--lime-green: #b9cc77;
+		--peach: #e0c59f;
+		--dusty-rose: #e2ccc8;
+		--mauve: #dfd8db;
+		--light-gray-2: #e2e2e2;
+		--sky-blue: #95c9ec;
+		--mint: #9cd6d5;
+		--sage: #c3d9c7;
+		--warm-gray: #dbdbd4;
+		--light-gray: #e2e2e2;
 	}
 
 	hr {
@@ -229,6 +263,7 @@
 		position: sticky;
 		top: 0;
 		z-index: 1;
+		padding: 1px;
 	}
 
 	header h1 {
@@ -261,6 +296,7 @@
 	.content {
 		overflow: auto;
 		padding: 0 20px;
+		margin-bottom: 60px; /* Account for footer (avoid cropping last row) */
 	}
 
 	th,
@@ -273,8 +309,31 @@
 	th {
 		position: sticky;
 		top: 0;
-		z-index: 2;
+		z-index: 0;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+	}
+
+	th.names,
+	td.names {
+		width: 20%;
+		max-width: 30%;
+		white-space: nowrap;
+	}
+
+	/* Don't apply white-space: nowrap on mobile */
+	@media (max-width: 600px) {
+		th.names,
+		td.names {
+			width: 50%;
+			white-space: wrap;
+		}
+	}
+
+	th.year,
+	td.year {
+		width: 5%;
+		max-width: 10%;
+		white-space: nowrap;
 	}
 
 	th.genres,
@@ -326,6 +385,20 @@
 		text-decoration: dashed underline;
 		text-underline-offset: 5px;
 		text-decoration-color: rgba(34, 34, 34, 0.5);
+	}
+
+	@media (max-width: 600px) {
+		.has-review {
+			text-decoration: solid underline;
+			text-decoration-color: rgba(34, 34, 34, 0.5);
+		}
+	}
+
+	.platform-icon {
+		align-items: center;
+		display: flex;
+		margin-left: 16px;
+		opacity: 0.7;
 	}
 
 	footer {

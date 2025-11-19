@@ -17,9 +17,14 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      - name: Get last commit date
+        id: commit_date
+        run: echo "date=$(git log -1 --format=%cd --date=iso8601)" >> $GITHUB_OUTPUT
+
       - name: build
         env:
           BASE_PATH: '/${{ github.event.repository.name }}'
+          VITE_LAST_COMMIT_DATE: ${{ steps.commit_date.outputs.date }}
         run: bun run build
 
       - name: Upload Artifacts

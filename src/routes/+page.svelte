@@ -86,6 +86,15 @@
 	uniqueGenres.forEach((genre, i) => {
 		genreColors[genre] = colors[i % colors.length];
 	});
+
+	const platformColors: Record<string, string> = {
+		EA: '#f76310',
+		GOG: '#6e23ad',
+		Nintendo: '#e60012',
+		Physical: '#808080',
+		Steam: '#1b5587',
+		Ubisoft: '#10182a'
+	};
 </script>
 
 <svelte:head>
@@ -105,7 +114,7 @@
 				<tr>
 					<th
 						class="names"
-						style="cursor:pointer"
+						style="cursor:pointer;"
 						title="Name of the game"
 						on:click={() => sortGames('Name')}
 					>
@@ -116,7 +125,7 @@
 					</th>
 					<th
 						class="year"
-						style="cursor:pointer"
+						style="cursor:pointer;"
 						title="Release year"
 						on:click={() => sortGames('Year')}
 					>
@@ -125,10 +134,10 @@
 							>{sortColumn === 'Year' ? (sortAsc ? '↑' : '↓') : '↕'}</span
 						>
 					</th>
-					<th class="genres" style="cursor:default" title="Genres of the game">Genres</th>
+					<th class="genres" style="cursor:default;" title="Genres of the game">Genres</th>
 					<th
 						class="centered"
-						style="cursor:pointer"
+						style="cursor:pointer;"
 						title="IGDB rating"
 						on:click={() => sortGames('Rating')}
 					>
@@ -139,7 +148,7 @@
 					</th>
 					<th
 						class="centered"
-						style="cursor:pointer"
+						style="cursor:pointer;"
 						title="Total playtime"
 						on:click={() => sortGames('Playtime')}
 					>
@@ -148,10 +157,13 @@
 							>{sortColumn === 'Playtime' ? (sortAsc ? '↑' : '↓') : '↕'}</span
 						>
 					</th>
-					<th style="cursor:default" title="Personal rating">Stars</th>
-					<th class="centered" style="cursor:default" title="Whether I own the game">Bought</th>
-					<th class="centered" style="cursor:default" title="Whether I have played the game"
+					<th style="cursor:default;" title="Personal rating">Stars</th>
+					<th class="centered" style="cursor:default;" title="Whether I own the game">Bought</th>
+					<th class="centered" style="cursor:default;" title="Whether I have played the game"
 						>Played</th
+					>
+					<th class="centered" style="cursor:default;" title="Store where the game was purchased"
+						>Store</th
 					>
 				</tr>
 			</thead>
@@ -170,11 +182,26 @@
 								{#if game.Platform}
 									<span class="platform-icon">
 										{#if game.Platform.toLowerCase() === 'pc'}
-											<HugeiconsIcon icon={ComputerIcon} size="16" />
+											<HugeiconsIcon
+												icon={ComputerIcon}
+												size={16}
+												color="#333333"
+												strokeWidth={2}
+											/>
 										{:else if game.Platform.toLowerCase().includes('playstation')}
-											<HugeiconsIcon icon={GameController01Icon} size="16" color="#003791" />
+											<HugeiconsIcon
+												icon={GameController01Icon}
+												size={16}
+												color="#003791"
+												strokeWidth={2}
+											/>
 										{:else if game.Platform.toLowerCase().includes('nintendo switch')}
-											<HugeiconsIcon icon={NintendoSwitchIcon} size="16" color="#B71C1C" />
+											<HugeiconsIcon
+												icon={NintendoSwitchIcon}
+												size={16}
+												color="#B71C1C"
+												strokeWidth={2}
+											/>
 										{/if}
 									</span>
 								{/if}
@@ -184,7 +211,7 @@
 						<td class="genres">
 							{#if game.Genres}
 								{#each game.Genres.split(',').map((g) => g.trim()) as genre}
-									<span class="chip" style="background:{genreColors[genre] || '#e0c3fc'}"
+									<span class="chip" style="background:{genreColors[genre] || '#e0c3fc'};"
 										>{genre}</span
 									>
 								{/each}
@@ -194,20 +221,33 @@
 						<td class="centered">{game.Playtime}</td>
 						<td class="centered review">
 							<Tooltip title={game.Review ? game.Review : 'No review available'}>
-								<span class={game.Review ? 'has-review' : ''}
-									>{'★'.repeat((game.Stars || '').split('⭐️').length - 1)}</span
-								>
+								{#if game.Review}
+									<span class="has-review"
+										>{'★'.repeat((game.Stars || '').split('⭐️').length - 1)}</span
+									>
+								{/if}
 							</Tooltip>
 						</td>
 						<td class="centered">
-							<span style="color: {game.Bought === 'Yes' ? '#2e7d32' : '#b71c1c'}"
+							<span style="color: {game.Bought === 'Yes' ? '#2e7d32' : '#b71c1c'};"
 								>{game.Bought === 'Yes' ? '✓' : '✗'}</span
 							>
 						</td>
 						<td class="centered">
-							<span style="color: {game.Played === 'Yes' ? '#2e7d32' : '#b71c1c'}"
+							<span style="color: {game.Played === 'Yes' ? '#2e7d32' : '#b71c1c'};"
 								>{game.Played === 'Yes' ? '✓' : '✗'}</span
 							>
+						</td>
+						<td class="centered">
+							{#if game.Store}
+								{#each game.Store.split(',').map((s) => s.trim()) as store}
+									<span
+										class="chip"
+										style="background:{platformColors[store] ||
+											'#e0c3fc'}; color: #eeeeee; opacity: 0.8;">{store}</span
+									>
+								{/each}
+							{/if}
 						</td>
 					</tr>
 				{/each}
@@ -279,9 +319,9 @@
 		display: inline-block;
 		color: #222;
 		border-radius: 12px;
-		padding: 2px 8px;
+		padding: 2px 6px;
 		margin: 2px 4px 2px 0;
-		font-size: 0.7rem;
+		font-size: 0.65rem;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 		opacity: 0.9;
 	}
@@ -316,16 +356,18 @@
 	th.names,
 	td.names {
 		width: 20%;
-		max-width: 30%;
-		white-space: nowrap;
+		max-width: 40%;
+		/* TODO */
+		/* white-space: nowrap; */
 	}
 
 	/* Don't apply white-space: nowrap on mobile */
 	@media (max-width: 600px) {
 		th.names,
 		td.names {
-			width: 50%;
-			white-space: wrap;
+			width: 40%;
+			/* TODO */
+			/* white-space: wrap; */
 		}
 	}
 
@@ -345,16 +387,18 @@
 	/* Hide some columns on mobile */
 	/* Genres, Rating, Bought, and Played */
 	@media (max-width: 600px) {
-		th:nth-child(8),
-		td:nth-child(8),
-		th:nth-child(7),
-		td:nth-child(7),
-		th:nth-child(5),
-		td:nth-child(5),
-		th:nth-child(4),
+		td:nth-child(3),
 		td:nth-child(4),
+		td:nth-child(5),
+		td:nth-child(7),
+		td:nth-child(8),
+		td:nth-child(9),
 		th:nth-child(3),
-		td:nth-child(3) {
+		th:nth-child(4),
+		th:nth-child(5),
+		th:nth-child(7),
+		th:nth-child(8),
+		th:nth-child(9) {
 			display: none;
 		}
 	}

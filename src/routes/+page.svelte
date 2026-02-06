@@ -4,6 +4,7 @@
 	import { HugeiconsIcon } from '@hugeicons/svelte';
 	import {
 		ComputerIcon,
+		GameboyIcon,
 		GameController01Icon,
 		NintendoSwitchIcon
 	} from '@hugeicons/core-free-icons';
@@ -57,6 +58,18 @@
 
 	// Sort by name
 	games = [...games].sort((a, b) => a.Name.localeCompare(b.Name));
+
+	// Sorted count by store
+	const storeCounts: Record<string, number> = {};
+	games.forEach((game) => {
+        if (game.Platform) {
+            const stores = game.Platform.split(',').map((p) => p.trim());
+            stores.forEach((store) => {
+                storeCounts[store] = (storeCounts[store] || 0) + 1;
+            });
+        }
+    });
+	console.log('Store counts:', storeCounts);
 
 	const uniqueGenres = Array.from(
 		new Set(
@@ -195,6 +208,13 @@
 												color="#003791"
 												strokeWidth={2}
 											/>
+										{:else if game.Platform.toLowerCase().includes('game boy')}
+										    <HugeiconsIcon
+                                                icon={GameboyIcon}
+                                                size={16}
+                                                color="#65547d"
+                                                strokeWidth={2}
+                                            />
 										{:else if game.Platform.toLowerCase().includes('nintendo switch')}
 											<HugeiconsIcon
 												icon={NintendoSwitchIcon}

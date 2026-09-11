@@ -3,11 +3,15 @@
 	import gamesData from './games.json' assert { type: 'json' };
 	import { HugeiconsIcon } from '@hugeicons/svelte';
 	import {
+		CancelCircleIcon,
 		ComputerIcon,
 		GameboyIcon,
 		GameController01Icon,
+		InformationCircleIcon,
 		NintendoSwitchIcon
 	} from '@hugeicons/core-free-icons';
+
+	let showStats = false;
 
 	type Game = {
 		Name: string;
@@ -108,6 +112,16 @@
 		Steam: '#1b5587',
 		Ubisoft: '#10182a'
 	};
+
+	// Hours per platform
+	const hoursPerPlatform: Record<string, number> = {};
+	games.forEach((game) => {
+		if (game.Platform && game.Playtime) {
+			hoursPerPlatform[game.Platform] = (hoursPerPlatform[game.Platform] || 0) + game.Playtime;
+		}
+	});
+	const sortedPlatforms = Object.entries(hoursPerPlatform).sort(([, a], [, b]) => b - a);
+	const totalHours = sortedPlatforms.reduce((sum, [, hours]) => sum + hours, 0);
 </script>
 
 <svelte:head>
@@ -283,13 +297,47 @@
 				style="color: inherit;">alxdrcirilo</a
 			>
 		</p>
-		<p>Showing {games.length} games</p>
+		<p>
+			Showing {games.length} games
+			<button class="info-btn" on:click={() => (showStats = true)} title="View statistics">
+				<HugeiconsIcon icon={InformationCircleIcon} size={14} color="#222" strokeWidth={2} />
+			</button>
+		</p>
 		<p>
 			Last updated: {new Date(
 				import.meta.env.VITE_LAST_COMMIT_DATE || Date.now()
 			).toLocaleDateString()}
 		</p>
 	</footer>
+
+	{#if showStats}
+		<div class="modal-overlay" on:click={() => (showStats = false)} role="presentation">
+			<div class="modal" on:click|stopPropagation role="dialog" aria-label="Statistics">
+				<div class="modal-header">
+					<h2>Statistics</h2>
+					<button class="close-btn" on:click={() => (showStats = false)} title="Close">
+						<HugeiconsIcon icon={CancelCircleIcon} size={20} color="#222" strokeWidth={2} />
+					</button>
+				</div>
+				<h3>Hours per platform</h3>
+				<div class="stats-list">
+					{#each sortedPlatforms as [platform, hours]}
+						<div class="stat-row">
+							<span class="stat-label">{platform}</span>
+							<div class="stat-bar-bg">
+								<div
+									class="stat-bar"
+									style="width: {(hours / sortedPlatforms[0][1]) * 100}%;"
+								></div>
+							</div>
+							<span class="stat-value">{hours}h</span>
+						</div>
+					{/each}
+				</div>
+				<p class="stat-total">Total: {totalHours} hours</p>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -315,7 +363,7 @@
 		border: none;
 		border-top: 1px dashed #222;
 		opacity: 0.5;
-		margin: 12px 0;
+		margin: 20px 0;
 	}
 
 	header {
@@ -482,5 +530,121 @@
 	footer p {
 		font-size: 0.65rem;
 		color: #222;
+	}
+
+	.info-btn {
+		all: unset;
+		cursor: pointer;
+		vertical-align: middle;
+		display: inline-flex;
+		align-items: center;
+		margin-left: 4px;
+		opacity: 0.6;
+		transition: opacity 0.2s;
+	}
+
+	.info-btn:hover {
+		opacity: 1;
+	}
+
+	.modal-overlay {
+		position: fixed;
+		inset: 0;
+		background-color: rgba(0, 0, 0, 0.4);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 100;
+	}
+
+	.modal {
+		background-color: #fcf2ec;
+		border-radius: 12px;
+		padding: 24px 28px;
+		min-width: 320px;
+		max-width: 420px;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+	}
+
+	.modal * {
+		background-color: transparent;
+	}
+
+	.modal-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 12px;
+	}
+
+	.modal h2 {
+		font-size: 1rem;
+		margin: 0;
+	}
+
+	.modal h3 {
+		font-size: 0.8rem;
+		margin: 0 0 12px 0;
+		opacity: 0.7;
+	}
+
+	.close-btn {
+		all: unset;
+		cursor: pointer;
+		opacity: 0.5;
+		transition: opacity 0.2s;
+	}
+
+	.close-btn:hover {
+		opacity: 1;
+	}
+
+	.stats-list {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.stat-row {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.stat-label {
+		font-size: 0.7rem;
+		width: 110px;
+		text-align: right;
+		flex-shrink: 0;
+	}
+
+	.stat-bar-bg {
+		flex: 1;
+		height: 14px;
+		background-color: #f0e0d6;
+		border-radius: 7px;
+		overflow: hidden;
+	}
+
+	.stat-bar {
+		height: 100%;
+		background-color: #c4956a;
+		border-radius: 7px;
+		transition: width 0.3s ease;
+	}
+
+	.stat-value {
+		font-size: 0.7rem;
+		width: 45px;
+		text-align: right;
+		flex-shrink: 0;
+		opacity: 0.7;
+	}
+
+	.stat-total {
+		font-size: 0.75rem;
+		text-align: right;
+		margin-top: 14px;
+		opacity: 0.7;
 	}
 </style>

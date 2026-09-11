@@ -446,6 +446,17 @@
 		white-space: nowrap;
 	}
 
+	/* Don't apply white-space: nowrap on mobile */
+	@media (max-width: 600px) {
+    	th.year,
+    	td.year {
+    		width: 10%;
+    		max-width: 20%;
+            /* TODO */
+			/* white-space: wrap; */
+    	}
+	}
+
 	th.genres,
 	td.genres {
 		width: 20%;

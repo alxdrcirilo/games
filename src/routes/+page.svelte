@@ -433,7 +433,7 @@
 	@media (max-width: 600px) {
 		th.names,
 		td.names {
-			width: 40%;
+			width: 30%;
 			/* TODO */
 			/* white-space: wrap; */
 		}

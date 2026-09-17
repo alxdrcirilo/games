@@ -7,11 +7,11 @@
 		ComputerIcon,
 		GameboyIcon,
 		GameController01Icon,
-		InformationCircleIcon,
 		NintendoSwitchIcon
 	} from '@hugeicons/core-free-icons';
 
 	let showStats = false;
+	let statsPage = 0;
 
 	type Game = {
 		Name: string;
@@ -63,18 +63,6 @@
 	// Sort by name
 	games = [...games].sort((a, b) => a.Name.localeCompare(b.Name));
 
-	// Sorted count by store
-	const storeCounts: Record<string, number> = {};
-	games.forEach((game) => {
-        if (game.Platform) {
-            const stores = game.Platform.split(',').map((p) => p.trim());
-            stores.forEach((store) => {
-                storeCounts[store] = (storeCounts[store] || 0) + 1;
-            });
-        }
-    });
-	console.log('Store counts:', storeCounts);
-
 	const uniqueGenres = Array.from(
 		new Set(
 			games.flatMap((game) => (game.Genres ? game.Genres.split(',').map((g) => g.trim()) : []))
@@ -113,6 +101,17 @@
 		Ubisoft: '#10182a'
 	};
 
+	// Statistics
+	type StatSlide = {
+		title: string;
+		rows: [string, number][];
+		unit: string;
+		total?: string;
+	};
+
+	const sortByValue = (counts: Record<string, number>) =>
+		Object.entries(counts).sort(([, a], [, b]) => b - a);
+
 	// Hours per platform
 	const hoursPerPlatform: Record<string, number> = {};
 	games.forEach((game) => {
@@ -120,8 +119,48 @@
 			hoursPerPlatform[game.Platform] = (hoursPerPlatform[game.Platform] || 0) + game.Playtime;
 		}
 	});
-	const sortedPlatforms = Object.entries(hoursPerPlatform).sort(([, a], [, b]) => b - a);
+	const sortedPlatforms = sortByValue(hoursPerPlatform);
 	const totalHours = sortedPlatforms.reduce((sum, [, hours]) => sum + hours, 0);
+
+	// Games per platform
+	const gamesPerPlatform: Record<string, number> = {};
+	games.forEach((game) => {
+		if (game.Platform) {
+			gamesPerPlatform[game.Platform] = (gamesPerPlatform[game.Platform] || 0) + 1;
+		}
+	});
+
+	// Games per store
+	const storeCounts: Record<string, number> = {};
+	games.forEach((game) => {
+		if (game.Store) {
+			const stores = game.Store.split(',').map((s) => s.trim());
+			stores.forEach((store) => {
+				storeCounts[store] = (storeCounts[store] || 0) + 1;
+			});
+		}
+	});
+
+	const statSlides: StatSlide[] = [
+		{
+			title: 'Hours per platform',
+			rows: sortedPlatforms,
+			unit: 'h',
+			total: `Total: ${totalHours} hours`
+		},
+		{
+			title: 'Games per platform',
+			rows: sortByValue(gamesPerPlatform),
+			unit: '',
+			total: `Total: ${games.length} games`
+		},
+		{ title: 'Store counts', rows: sortByValue(storeCounts), unit: '' }
+	];
+
+	function openStats() {
+		statsPage = 0;
+		showStats = true;
+	}
 </script>
 
 <svelte:head>
@@ -131,9 +170,21 @@
 
 <div class="container">
 	<header>
-		<h1>Game Reviews 🎮</h1>
-		<p>Reviews of all the games I've played.</p>
-		<hr />
+		<div class="header-left">
+			<h1>Game Reviews 🎮</h1>
+			<p>Reviews of all the games I've played.</p>
+		</div>
+		<div class="header-right">
+			<p class="last-updated">
+				Last update:
+				<a href="https://github.com/alxdrcirilo/games" target="_blank" rel="noopener noreferrer">
+					{new Date(import.meta.env.VITE_LAST_COMMIT_DATE || Date.now()).toLocaleDateString()}
+				</a>
+			</p>
+			<p>
+				<button class="stats-btn" on:click={openStats} title="View statistics">Show stats</button>
+			</p>
+		</div>
 	</header>
 	<div class="content">
 		<table>
@@ -168,7 +219,7 @@
 						title="IGDB rating"
 						on:click={() => sortGames('Rating')}
 					>
-						Rating
+						IGDB Rating
 						<span style="font-size:0.8em;"
 							>{sortColumn === 'Rating' ? (sortAsc ? '↑' : '↓') : '↕'}</span
 						>
@@ -184,7 +235,7 @@
 							>{sortColumn === 'Playtime' ? (sortAsc ? '↑' : '↓') : '↕'}</span
 						>
 					</th>
-					<th style="cursor:default;" title="Personal rating">Stars</th>
+					<th class="stars" style="cursor:default;" title="Personal rating">Stars</th>
 					<th class="centered" style="cursor:default;" title="Whether I own the game">Bought</th>
 					<th class="centered" style="cursor:default;" title="Whether I have played the game"
 						>Played</th
@@ -223,12 +274,7 @@
 												strokeWidth={2}
 											/>
 										{:else if game.Platform.toLowerCase().includes('game boy')}
-										    <HugeiconsIcon
-                                                icon={GameboyIcon}
-                                                size={16}
-                                                color="#65547d"
-                                                strokeWidth={2}
-                                            />
+											<HugeiconsIcon icon={GameboyIcon} size={16} color="#65547d" strokeWidth={2} />
 										{:else if game.Platform.toLowerCase().includes('nintendo switch')}
 											<HugeiconsIcon
 												icon={NintendoSwitchIcon}
@@ -253,7 +299,7 @@
 						</td>
 						<td class="centered">{game.Rating}</td>
 						<td class="centered">{game.Playtime}</td>
-						<td class="centered review">
+						<td class="centered review stars">
 							<Tooltip title={game.Review ? game.Review : 'No review available'}>
 								{#if game.Review}
 									<span class="has-review"
@@ -288,29 +334,9 @@
 			</tbody>
 		</table>
 	</div>
-	<footer>
-		<p>
-			Made with ❤️ by <a
-				href="https://alxdrcirilo.dev"
-				target="_blank"
-				rel="noopener noreferrer"
-				style="color: inherit;">alxdrcirilo</a
-			>
-		</p>
-		<p>
-			Showing {games.length} games
-			<button class="info-btn" on:click={() => (showStats = true)} title="View statistics">
-				<HugeiconsIcon icon={InformationCircleIcon} size={14} color="#222" strokeWidth={2} />
-			</button>
-		</p>
-		<p>
-			Last updated: {new Date(
-				import.meta.env.VITE_LAST_COMMIT_DATE || Date.now()
-			).toLocaleDateString()}
-		</p>
-	</footer>
 
 	{#if showStats}
+		{@const slide = statSlides[statsPage]}
 		<div class="modal-overlay" on:click={() => (showStats = false)} role="presentation">
 			<div class="modal" on:click|stopPropagation role="dialog" aria-label="Statistics">
 				<div class="modal-header">
@@ -319,22 +345,36 @@
 						<HugeiconsIcon icon={CancelCircleIcon} size={20} color="#222" strokeWidth={2} />
 					</button>
 				</div>
-				<h3>Hours per platform</h3>
+				<h3>{slide.title}</h3>
 				<div class="stats-list">
-					{#each sortedPlatforms as [platform, hours]}
+					{#each slide.rows as [label, value]}
 						<div class="stat-row">
-							<span class="stat-label">{platform}</span>
+							<span class="stat-label">{label}</span>
 							<div class="stat-bar-bg">
-								<div
-									class="stat-bar"
-									style="width: {(hours / sortedPlatforms[0][1]) * 100}%;"
-								></div>
+								<div class="stat-bar" style="width: {(value / slide.rows[0][1]) * 100}%;"></div>
 							</div>
-							<span class="stat-value">{hours}h</span>
+							<span class="stat-value">{value}{slide.unit}</span>
 						</div>
 					{/each}
 				</div>
-				<p class="stat-total">Total: {totalHours} hours</p>
+				{#if slide.total}
+					<p class="stat-total">{slide.total}</p>
+				{/if}
+				<div class="stats-nav">
+					<button
+						class="nav-btn"
+						on:click={() => (statsPage -= 1)}
+						disabled={statsPage === 0}
+						aria-label="Previous statistics">&lt;</button
+					>
+					<span class="stats-page">{statsPage + 1} / {statSlides.length}</span>
+					<button
+						class="nav-btn"
+						on:click={() => (statsPage += 1)}
+						disabled={statsPage === statSlides.length - 1}
+						aria-label="Next statistics">&gt;</button
+					>
+				</div>
 			</div>
 		</div>
 	{/if}
@@ -356,42 +396,66 @@
 		--mint: #9cd6d5;
 		--sage: #c3d9c7;
 		--warm-gray: #dbdbd4;
-		--light-gray: #e2e2e2;
-	}
-
-	hr {
-		border: none;
-		border-top: 1px dashed #222;
-		opacity: 0.5;
-		margin: 20px 0;
 	}
 
 	header {
-		text-align: center;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		text-align: left;
 		position: sticky;
 		top: 0;
 		z-index: 1;
-		padding: 1px;
+		padding: 0 20px 10px 20px;
 	}
 
 	header h1 {
-		font-size: 1.5rem;
+		font-size: 1.3rem;
+		margin-bottom: 0;
 	}
 
 	header p {
 		opacity: 0.75;
-		font-size: 0.725rem;
+		font-size: 0.65rem;
+		margin-top: 8px;
+	}
+
+	.header-right {
+		text-align: right;
+	}
+
+	.header-right p {
+		margin-top: 0;
+	}
+
+	.header-right .last-updated {
+		margin-top: 8px;
+	}
+
+	.last-updated a {
+		color: inherit;
+		text-decoration: underline;
+	}
+
+	.stats-btn {
+		all: unset;
+		cursor: pointer;
+		font-family: inherit;
+		font-size: inherit;
+		color: inherit;
+		text-decoration: underline;
 	}
 
 	.chip {
 		display: inline-block;
 		color: #222;
-		border-radius: 12px;
+		border: 1px solid #222;
+		border-radius: 0;
 		padding: 2px 6px;
 		margin: 2px 4px 2px 0;
 		font-size: 0.65rem;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-		opacity: 0.9;
+		box-shadow: 2px 2px 0 #222;
+		opacity: 0.95;
 	}
 
 	table {
@@ -404,12 +468,11 @@
 	.content {
 		overflow: auto;
 		padding: 0 20px;
-		margin-bottom: 60px; /* Account for footer (avoid cropping last row) */
 	}
 
 	th,
 	td {
-		border-bottom: 1px solid #ddd;
+		border-bottom: 1px dashed #444;
 		padding: 8px;
 		font-size: 0.7rem;
 	}
@@ -448,13 +511,13 @@
 
 	/* Don't apply white-space: nowrap on mobile */
 	@media (max-width: 600px) {
-    	th.year,
-    	td.year {
-    		width: 10%;
-    		max-width: 20%;
-            /* TODO */
+		th.year,
+		td.year {
+			width: 10%;
+			max-width: 20%;
+			/* TODO */
 			/* white-space: wrap; */
-    	}
+		}
 	}
 
 	th.genres,
@@ -522,40 +585,6 @@
 		opacity: 0.7;
 	}
 
-	footer {
-		display: flex;
-		justify-content: space-between;
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		width: 100%;
-		text-align: center;
-		border-top: 1px dashed rgba(34, 34, 34, 0.5);
-		padding-left: 1rem;
-		padding-right: 1rem;
-		box-sizing: border-box;
-	}
-
-	footer p {
-		font-size: 0.65rem;
-		color: #222;
-	}
-
-	.info-btn {
-		all: unset;
-		cursor: pointer;
-		vertical-align: middle;
-		display: inline-flex;
-		align-items: center;
-		margin-left: 4px;
-		opacity: 0.6;
-		transition: opacity 0.2s;
-	}
-
-	.info-btn:hover {
-		opacity: 1;
-	}
-
 	.modal-overlay {
 		position: fixed;
 		inset: 0;
@@ -568,11 +597,12 @@
 
 	.modal {
 		background-color: #fcf2ec;
-		border-radius: 12px;
+		border: 1px solid #222;
+		border-radius: 0;
 		padding: 24px 28px;
 		min-width: 320px;
 		max-width: 420px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+		box-shadow: 4px 4px 0 #222;
 	}
 
 	.modal * {
@@ -631,14 +661,16 @@
 		flex: 1;
 		height: 14px;
 		background-color: #f0e0d6;
-		border-radius: 7px;
+		border: 1px solid #222;
+		border-radius: 0;
 		overflow: hidden;
 	}
 
 	.stat-bar {
 		height: 100%;
-		background-color: #c4956a;
-		border-radius: 7px;
+		background-color: #1b5587;
+		opacity: 0.5;
+		border-radius: 0;
 		transition: width 0.3s ease;
 	}
 
@@ -653,7 +685,38 @@
 	.stat-total {
 		font-size: 0.75rem;
 		text-align: right;
-		margin-top: 14px;
+		margin: 14px 0 0 0;
+		opacity: 0.7;
+	}
+
+	.stats-nav {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-top: 18px;
+	}
+
+	.nav-btn {
+		font-family: inherit;
+		font-size: 0.8rem;
+		line-height: 1;
+		color: #222;
+		background: none;
+		border: 1px solid #222;
+		border-radius: 0;
+		box-shadow: 2px 2px 0 #222;
+		padding: 4px 10px;
+		cursor: pointer;
+	}
+
+	.nav-btn:disabled {
+		opacity: 0.3;
+		box-shadow: none;
+		cursor: default;
+	}
+
+	.stats-page {
+		font-size: 0.7rem;
 		opacity: 0.7;
 	}
 </style>

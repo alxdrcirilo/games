@@ -51,15 +51,14 @@
 
 <style>
 	.tooltip {
-		border: 1px solid #444;
-		box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.25);
-		color: #f3f3f3;
-		background: #333;
-		border-radius: 6px;
+		border: 1px solid #222;
+		box-shadow: 2px 2px 0 #222;
+		color: #222;
+		background: #f0e0d6;
+		border-radius: 0;
 		padding: 8px 12px;
 		font-size: 0.7rem;
 		position: absolute;
 		z-index: 1000;
-		transition: box-shadow 0.2s;
 	}
 </style>

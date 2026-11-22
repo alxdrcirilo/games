@@ -107,6 +107,7 @@
 		rows: [string, number][];
 		unit: string;
 		total?: string;
+		vertical?: boolean;
 	};
 
 	const sortByValue = (counts: Record<string, number>) =>
@@ -141,6 +142,18 @@
 		}
 	});
 
+	// Stars distribution
+	const starsCounts: Record<string, number> = { '1 ★': 0, '2 ★': 0, '3 ★': 0, '4 ★': 0, '5 ★': 0 };
+	games.forEach((game) => {
+		const stars = (game.Stars || '').split('⭐️').length - 1;
+		if (stars > 0) {
+			starsCounts[`${stars} ★`] = (starsCounts[`${stars} ★`] || 0) + 1;
+		}
+	});
+	const sortedStars: [string, number][] = Object.entries(starsCounts).sort(
+		([a], [b]) => parseInt(a) - parseInt(b)
+	);
+
 	const statSlides: StatSlide[] = [
 		{
 			title: 'Hours per platform',
@@ -154,7 +167,8 @@
 			unit: '',
 			total: `Total: ${games.length} games`
 		},
-		{ title: 'Store counts', rows: sortByValue(storeCounts), unit: '' }
+		{ title: 'Store counts', rows: sortByValue(storeCounts), unit: '' },
+		{ title: 'Stars distribution', rows: sortedStars, unit: '', vertical: true }
 	];
 
 	function openStats() {
@@ -337,6 +351,7 @@
 
 	{#if showStats}
 		{@const slide = statSlides[statsPage]}
+		{@const maxValue = Math.max(...slide.rows.map(([, value]) => value))}
 		<div class="modal-overlay" on:click={() => (showStats = false)} role="presentation">
 			<div class="modal" on:click|stopPropagation role="dialog" aria-label="Statistics">
 				<div class="modal-header">
@@ -346,17 +361,32 @@
 					</button>
 				</div>
 				<h3>{slide.title}</h3>
-				<div class="stats-list">
-					{#each slide.rows as [label, value]}
-						<div class="stat-row">
-							<span class="stat-label">{label}</span>
-							<div class="stat-bar-bg">
-								<div class="stat-bar" style="width: {(value / slide.rows[0][1]) * 100}%;"></div>
+				{#if slide.vertical}
+					<div class="stats-columns">
+						{#each slide.rows as [label, value]}
+							<div class="stat-column">
+								<span class="stat-value">{value}{slide.unit}</span>
+								<div class="stat-col-bg">
+									<div class="stat-col-empty" style="flex-grow: {maxValue - value};"></div>
+									<div class="stat-col" style="flex-grow: {value};"></div>
+								</div>
+								<span class="stat-label">{label}</span>
 							</div>
-							<span class="stat-value">{value}{slide.unit}</span>
-						</div>
-					{/each}
-				</div>
+						{/each}
+					</div>
+				{:else}
+					<div class="stats-list">
+						{#each slide.rows as [label, value]}
+							<div class="stat-row">
+								<span class="stat-label">{label}</span>
+								<div class="stat-bar-bg">
+									<div class="stat-bar" style="width: {(value / maxValue) * 100}%;"></div>
+								</div>
+								<span class="stat-value">{value}{slide.unit}</span>
+							</div>
+						{/each}
+					</div>
+				{/if}
 				{#if slide.total}
 					<p class="stat-total">{slide.total}</p>
 				{/if}
@@ -680,6 +710,58 @@
 		text-align: right;
 		flex-shrink: 0;
 		opacity: 0.7;
+	}
+
+	.stats-columns {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-around;
+		gap: 10px;
+		height: 160px;
+	}
+
+	.stat-column {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
+		height: 100%;
+		flex: 1;
+	}
+
+	.stat-col-bg {
+		width: 24px;
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		background-color: #f0e0d6;
+		border: 1px solid #222;
+		border-radius: 0;
+		overflow: hidden;
+	}
+
+	.stat-col-empty {
+		flex-shrink: 0;
+		flex-basis: 0;
+	}
+
+	.stat-col {
+		flex-shrink: 0;
+		flex-basis: 0;
+		width: 100%;
+		background-color: #1b5587;
+		opacity: 0.5;
+		border-radius: 0;
+		transition: flex-grow 0.3s ease;
+	}
+
+	.stat-column .stat-label {
+		width: auto;
+		text-align: center;
+	}
+
+	.stat-column .stat-value {
+		width: auto;
 	}
 
 	.stat-total {
